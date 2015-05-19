@@ -1,0 +1,25 @@
+
+<div class="row" style="margin-top: 20px;">
+    <div class="col-sm-3">
+        <h1>BiGCam</h1>
+    </div>
+
+    <div class="col-sm-9">
+        <ul class="nav nav-tabs" id="nav">
+            <li role="presentation" class="active"><a ui-sref="home">上传视频</a></li>
+            <li role="presentation"><a ui-sref="list">视频列表</a></li>
+            <li role="presentation"><a ui-sref="suggestions">反馈列表</a></li>
+        </ul>
+    </div>
+</div>
+
+
+
+<script type="application/javascript">
+    $(function(){
+        $('#nav li a').click(function() {
+            $('#nav').find('li').removeClass('active');
+            $(this).parent().addClass('active');
+        })
+    })
+</script>

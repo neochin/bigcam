@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mongo="http://www.springframework.org/schema/data/mongo"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-4.0.xsd
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd
+        http://www.springframework.org/schema/data/mongo
+        http://www.springframework.org/schema/data/mongo/spring-mongo.xsd">
+    <context:component-scan base-package="com.enginecore.bigcam.mng"/>
+    <mvc:annotation-driven/>
+    <mongo:mongo host="${mongo.host}" port="${mongo.port}" id="mongo"/>
+    <mongo:db-factory dbname="${mongo.dbname}" mongo-ref="mongo" id="mongoDbFactory"/>
+    <bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
+        <constructor-arg name="mongoDbFactory" ref="mongoDbFactory"/>
+    </bean>
+    <mongo:mapping-converter base-package="com.enginecore.bigcam.core.dao"/>
+    <context:annotation-config/>
+
+    <bean id="viewResolver" class="org.springframework.web.servlet.view.BeanNameViewResolver"/>
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <property name="defaultEncoding" value="UTF-8"/>
+    </bean>
+
+    <bean id="propertyConfigurer"
+          class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <value>classpath*:conf/database.properties</value>
+                <value>classpath*:conf/bigcam.properties</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="stat-filter" class="com.alibaba.druid.filter.stat.StatFilter"/>
+
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource"
+          init-method="init" destroy-method="close">
+        <property name="url" value="${database.url}"/>
+        <property name="username" value="${database.username}"/>
+        <property name="password" value="${database.password}"/>
+        <property name="proxyFilters">
+            <list>
+                <ref bean="stat-filter"/>
+            </list>
+        </property>
+    </bean>
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="mapperLocations" value="classpath*:mappers/mybatis-*.xml"/>
+    </bean>
+
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="annotationClass" value="org.springframework.stereotype.Repository"/>
+        <property name="basePackage" value="com.enginecore.bigcam.core.dao"/>
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+    </bean>
+
+    <!-- 允许单个key的json view -->
+    <bean id="singleKeyJsonView" class="com.alibaba.fastjson.support.spring.FastJsonJsonView">
+        <property name="extractValueFromSingleKeyModel" value="false"/>
+    </bean>
+    <!-- 不允许单个key的json view -->
+    <bean id="jsonView" class="com.alibaba.fastjson.support.spring.FastJsonJsonView">
+        <property name="extractValueFromSingleKeyModel" value="true"/>
+    </bean>
+
+    <mvc:interceptors>
+        <bean class="com.enginecore.bigcam.mng.interceptor.AuthenticationInterceptor">
+            <property name="loginURI" value="/user/login"/>
+            <property name="registerURI" value="/user/register"/>
+            <property name="skipTokenURI">
+                <set>
+                    <value>/user/upload_login</value>
+                    <value>/video/refresh</value>
+                    <value>/video/load</value>
+                    <value>/video/list</value>
+                    <value>/video/{videoId}/play</value>
+                    <value>/video/{videoId}/like</value>
+                    <value>/video/{videoId}/likedUsers</value>
+                    <value>/checkUpdate</value>
+                    <value>/comment/{videoId}</value>
+                    <value>/comment/load/{videoId}</value>
+                    <value>/comment/{commentId}/praise</value>
+                    <value>/comment/{commentId}/unPraise</value>
+                    <value>/channel/list</value>
+                    <value>/suggestion/suggest</value>
+                </set>
+            </property>
+        </bean>
+        <bean class="com.enginecore.bigcam.mng.interceptor.ViewNameInterceptor">
+            <property name="defaultView" value="singleKeyJsonView"/>
+            <property name="forceViewSet">
+                <set></set>
+            </property>
+        </bean>
+    </mvc:interceptors>
+
+    <import resource="classpath*:conf/context.xml"/>
+</beans>

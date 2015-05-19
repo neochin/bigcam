@@ -1,0 +1,42 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.enginecore.bigcam.core.dao.CommentDao">
+    <insert id="comment" parameterType="com.enginecore.bigcam.dto.beans.Comment">
+        INSERT INTO qh_comment (user_id, video_id, video_user_id, replied_user_id, comment_text, praise_times, comment_time)
+        VALUES(#{userId}, #{videoId}, #{videoUserId}, #{repliedUserId}, #{commentText}, #{praiseTimes}, now())
+    </insert>
+
+    <sql id="commentMap">
+        SELECT qc.comment_id as commentId, u.user_id as userId, u.nickname as nickname,reply.user_id as repliedUserId, reply.nickname as repliedNickname,
+        qc.comment_text as commentText, u.profile_photo as profilePhoto, reply.profile_photo as repliedProfilePhoto, qc.praise_times as praiseTimes
+        FROM qh_comment qc
+        left join qh_user u ON qc.user_id=u.user_id
+        left join qh_user reply on qc.replied_user_id=reply.user_id
+    </sql>
+
+    <select id="refresh" resultType="java.util.Map">
+        <include refid="commentMap"/>
+        WHERE qc.video_id=#{videoId}
+        ORDER BY qc.comment_id DESC
+        <if test="limit != null and limit>0">
+            limit #{limit}
+        </if>
+    </select>
+    <select id="load" resultType="java.util.Map">
+        <include refid="commentMap"/>
+        WHERE qc.video_id=#{videoId}
+        AND qc.comment_id &lt; #{commentId}
+        ORDER BY qc.comment_id DESC
+        <if test="limit != null and limit>0">
+            limit #{limit}
+        </if>
+    </select>
+
+    <update id="praise">
+        UPDATE qh_comment SET praise_times = praise_times + 1 WHERE comment_id=#{commentId}
+    </update>
+
+    <update id="unPraise">
+        UPDATE qh_comment SET praise_times = praise_times - 1 WHERE comment_id=#{commentId}
+    </update>
+</mapper>

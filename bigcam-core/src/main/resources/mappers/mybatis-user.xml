@@ -1,0 +1,188 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.enginecore.bigcam.core.dao.UserDao">
+    <resultMap id="user" type="com.enginecore.bigcam.dto.beans.User">
+        <id column="user_id" property="userId"/>
+        <result column="username" property="username"/>
+        <result column="password" property="password"/>
+        <result column="email" property="email"/>
+        <result column="nickname" property="nickname"/>
+        <result column="register_date" property="registerDate"/>
+        <result column="access_token" property="accessToken"/>
+        <result column="open_id" property="openId"/>
+        <result column="auth_type" property="authType"/>
+    </resultMap>
+    <select id="findByUsername" resultMap="user">
+        select username,user_id,nickname,register_date,email,password, access_token, open_id, auth_type from qh_user where username=#{username}
+    </select>
+    <select id="findByNickname" resultMap="user">
+        select username,user_id,nickname,register_date,email,password, access_token, open_id, auth_type from qh_user where nickname=#{nickname}
+    </select>
+    <insert id="register" parameterType="com.enginecore.bigcam.dto.beans.User" useGeneratedKeys="true" keyProperty="userId">
+        insert into qh_user (username, password, email, nickname, access_token, open_id, auth_type, register_date)
+        VALUES (#{username}, #{password}, #{email}, #{nickname}, #{accessToken}, #{openId}, #{authType}, now())
+    </insert>
+
+    <select id="userProfile" resultType="java.util.Map">
+        select u.nickname, u.gender, p.text_cn as province, c.text_cn as city, u.signature_text as signatureText,
+        u.journey, u.pace_num as paceNum, u.certificated as certificated, u.username, u.profile_photo as profilePhoto
+        from qh_user u left join qh_province p
+        on u.province_id=p.province_id
+        left join qh_city c on c.city_id=u.city_id
+        where u.user_id=#{userId}
+    </select>
+
+    <sql id="defaultLimit">
+        <if test="limit != null and limit>0">
+            limit #{limit}
+        </if>
+    </sql>
+
+    <select id="searchRefresh" resultType="java.lang.Integer">
+        select u.user_id
+        from qh_user u
+        where u.nickname like "%"#{word}"%"
+        ORDER BY u.user_id
+        <include refid="defaultLimit"/>
+    </select>
+
+    <select id="searchLoad" resultType="java.util.Map">
+        select u.user_id
+        from qh_user u
+        where u.nickname like "%"#{word}"%"
+        AND u.user_id &lt; #{userId}
+        ORDER BY u.user_id
+        <include refid="defaultLimit"/>
+    </select>
+
+    <select id="likeTimes" resultType="java.lang.Integer">
+        SELECT count(*)
+        FROM qh_like_video
+        where video_user_id=#{userId}
+    </select>
+    <select id="likeNum" resultType="java.lang.Integer">
+        SELECT count(*)
+        FROM qh_like_video
+        where <include refid="userId"/>
+    </select>
+
+    <select id="followerNum" resultType="java.lang.Integer">
+        SELECT count(*)
+        from qh_follower
+        where
+        <include refid="userId"/>
+    </select>
+    <select id="attentionNum" resultType="java.lang.Integer">
+        SELECT count(*)
+        from qh_follower
+        where follower_id=#{userId}
+    </select>
+    <select id="topicNum" resultType="java.lang.Integer">
+        SELECT count(*)
+        FROM qh_user_video_topic
+        WHERE
+        <include refid="userId"/>
+    </select>
+
+    <select id="followTo" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM qh_follower
+        WHERE follower_id=#{followerId} and
+        <include refid="userId"/>
+    </select>
+
+    <update id="setProfilePhoto">
+        UPDATE qh_user SET profile_photo=#{profilePhoto} where
+        <include refid="userId"/>
+    </update>
+
+    <sql id="userId">
+        user_id=#{userId}
+    </sql>
+
+    <update id="updateNickname">
+        UPDATE qh_user SET nickname=#{nickname} where
+        <include refid="userId"/>
+    </update>
+
+    <update id="updateGender">
+        UPDATE qh_user SET
+        <choose>
+            <when test="gender == ''">
+                gender NULL
+            </when>
+            <otherwise>
+                gender=#{gender}
+            </otherwise>
+        </choose>
+        WHERE
+        <include refid="userId"/>
+    </update>
+    <update id="updateLocation">
+        UPDATE qh_user SET
+        province_id=#{provinceId},city_id=#{cityId}
+        WHERE
+        <include refid="userId"/>
+    </update>
+    <update id="setSignature">
+        UPDATE qh_user SET
+        signature_text=#{signatureText}
+        where
+        <include refid="userId"/>
+    </update>
+    <select id="shareTimes" resultType="java.lang.Integer">
+        SELECT SUM(share_times)
+        FROM qh_video
+        WHERE user_id=#{userId}
+    </select>
+
+    <select id="destinationNum" resultType="java.util.Map">
+        SELECT COUNT(DISTINCT d.province) as provinceNum, COUNT(DISTINCT d.city) AS cityNum, COUNT(DISTINCT d.destination_id) as destinationNum
+        FROM qh_destination d
+        WHERE destination_id in(
+          SELECT DISTINCT l.destination_id
+          FROM qh_location l
+          WHERE l.location_id in(
+            SELECT DISTINCT v.location_id
+            FROM qh_video v
+            WHERE v.user_id=#{userId}
+          )
+        )
+    </select>
+
+    <select id="personalAchievement" resultType="java.util.Map">
+        SELECT u.journey, u.pace_num as paceNum, vv.take_time as firstPaceDate
+        FROM qh_user u join (
+          SELECT v.take_time as take_time
+          FROM qh_video v
+          WHERE v.user_id=#{userId}
+          ORDER BY v.video_id
+          limit 1
+        ) vv
+        WHERE u.user_id=#{userId}
+    </select>
+
+    <select id="locations" resultType="java.util.List">
+        SELECT v.video_id as videoId, v.take_time as takeTime,
+        l.longitude as longitude, l.latitude as latitude, l.altitude as altitude
+        FROM qh_video v join qh_location l
+        ON v.location_id=l.location_id
+        WHERE v.user_id=#{userId}
+        ORDER BY v.video_id DESC limit #{limit}
+    </select>
+
+    <select id="likeVideo" resultType="java.util.Map">
+        SELECT v.video_id as videoId, v.video_cover as videoCover, v.video_content as videoContent
+        FROM qh_like_video lv JOIN qh_video v
+        ON lv.video_id=v.video_id
+        WHERE lv.user_id=#{userId}
+        ORDER BY lv.like_date desc
+    </select>
+
+    <update id="addPace">
+        UPDATE qh_user SET pace_num = pace_num + 1 WHERE user_id=#{userId}
+    </update>
+    <update id="addJourney">
+        UPDATE qh_user SET journey = journey + #{journey} WHERE user_id=#{userId}
+    </update>
+</mapper>

@@ -1,0 +1,34 @@
+<div class="row">
+    <div class="col-sm-12">
+        <table class="table table-striped">
+            <thead>
+                <th style="width: 7%;">频道</th>
+                <th style="width: 10%;">时长(s)</th>
+                <th style="width: 16%;">播放链接</th>
+                <th style="width: 22%;">标题</th>
+                <th style="width: 15%;">上传时间</th>
+                <th style="width: 30%;">描述</th>
+            </thead>
+            <tbody>
+                <tr ng-repeat="biGCam in biGCams">
+                    <td>{{biGCam.channelText}}</td>
+                    <td>{{biGCam.duration}}</td>
+                    <td>{{biGCam.url}}</td>
+                    <td>{{biGCam.title}}</td>
+                    <td>{{biGCam.uploadTime}}</td>
+                    <td>{{biGCam.desc}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-12">
+        <nav>
+            <ul class="pager">
+                <li class="previous"><a href="#"><span aria-hidden="true">&larr;</span> Older</a></li>
+                <li class="next"><a href="#">Newer <span aria-hidden="true">&rarr;</span></a></li>
+            </ul>
+        </nav>
+    </div>
+</div>

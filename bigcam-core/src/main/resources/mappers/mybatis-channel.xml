@@ -1,0 +1,14 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.enginecore.bigcam.core.dao.ChannelDao">
+
+    <resultMap id="channel" type="com.enginecore.bigcam.dto.beans.Channel">
+        <id column="channel_id" property="id"/>
+        <result column="channel_text" property="channelText"/>
+    </resultMap>
+
+    <select id="list" resultMap="channel">
+        SELECT channel_id, channel_text
+        FROM qh_channel
+    </select>
+</mapper>

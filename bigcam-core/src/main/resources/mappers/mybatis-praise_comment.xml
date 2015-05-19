@@ -1,0 +1,17 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.enginecore.bigcam.core.dao.UserPraiseCommentDao">
+    <insert id="praise">
+        INSERT INTO qh_user_praise_comment(user_id, comment_id, praise_time)
+        VALUES (#{userId}, #{commentId}, now())
+    </insert>
+
+    <delete id="unPraise">
+        DELETE FROM qh_user_praise_comment
+        WHERE user_id=#{userId} AND comment_id=#{commentId}
+    </delete>
+
+    <select id="praised" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM qh_user_praise_comment WHERE user_id=#{userId} AND comment_id=#{commentId}
+    </select>
+</mapper>

@@ -1,0 +1,28 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.enginecore.bigcam.core.dao.UserLikeVideoDao">
+    <insert id="like">
+        INSERT INTO qh_user_like_video(user_id, video_id, like_time)
+        VALUES (#{userId}, #{videoId}, now())
+    </insert>
+
+    <delete id="unLike">
+        DELETE FROM qh_user_like_video
+        WHERE user_id=#{userId} AND video_id=#{videoId}
+    </delete>
+
+    <select id="liked" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM qh_user_like_video WHERE user_id=#{userId} AND video_id=#{videoId}
+    </select>
+
+    <select id="likedUsers" resultType="java.util.Map">
+        SELECT qu.user_id as userId, qu.nickname as nickname, qu.profile_photo as profilePhoto
+        FROM qh_user_like_video qulv JOIN qh_user qu
+        ON qulv.user_id=qu.user_id
+        WHERE qulv.video_id=#{videoId}
+        ORDER BY like_time DESC
+        <if test="start != null">
+            limit #{start},#{limit}
+        </if>
+    </select>
+</mapper>

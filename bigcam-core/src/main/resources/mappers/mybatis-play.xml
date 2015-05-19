@@ -1,0 +1,12 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.enginecore.bigcam.core.dao.UserLikeVideoDao">
+    <insert id="play">
+        INSERT INTO qh_user_play_video(user_id, video_id, like_time)
+        VALUES (#{userId}, #{videoId}, now())
+    </insert>
+
+    <select id="played" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM qh_user_play_video WHERE user_id=#{userId} AND video_id=#{videoId}
+    </select>
+</mapper>
