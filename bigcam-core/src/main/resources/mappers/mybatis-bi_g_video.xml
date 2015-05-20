@@ -33,9 +33,14 @@
         video_url, like_times, play_times, comment_times, share_times, store_times, upload_time, video_id
         FROM qh_video v JOIN qh_channel c
         ON v.channel_id=c.channel_id
-        <if test="channel != null">
-            WHERE v.channel_id=#{channel}
-        </if>
+        <where>
+            <if test="channel != null">
+                v.channel_id=#{channel}
+            </if>
+            <if test="keyword != null">
+                and v.video_title like "%"#{keyword}"%" OR v.video_desc like "%"#{keyword}"%"
+            </if>
+        </where>
         ORDER BY upload_time
         <if test="start != null">limit #{start}, #{limit}</if>
     </select>

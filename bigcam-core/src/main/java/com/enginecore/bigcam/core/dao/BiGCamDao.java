@@ -13,7 +13,7 @@ import java.util.List;
 public interface BiGCamDao {
     void save(BiGVideo biGVideo);
 
-    List<BiGVideo> list(@Param("channel") Integer channel, @Param("start") Integer start, @Param("limit") Integer limit);
+    List<BiGVideo> list(@Param("keyword") String keyword, @Param("channel") Integer channel, @Param("start") Integer start, @Param("limit") Integer limit);
 
     List<BiGVideo> liked(@Param("userId") Integer userId, @Param("start") Integer start, @Param("limit") Integer limit);
 

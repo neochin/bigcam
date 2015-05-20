@@ -75,8 +75,8 @@ public class VideoServiceImpl implements VideoService{
     }
 
     @Override
-    public List<BiGVideo> list(Integer userId, Integer channel, Integer start, Integer limit) {
-        List<BiGVideo> list = biGCamDao.list(channel, start, limit);
+    public List<BiGVideo> list(String keyword, Integer userId, Integer channel, Integer start, Integer limit) {
+        List<BiGVideo> list = biGCamDao.list(keyword, channel, start, limit);
         addLiked4List(list, userId);
         return list;
     }

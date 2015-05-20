@@ -13,7 +13,7 @@ public interface VideoService {
     Integer upload(MultipartFile videoCover, String videoDesc, String url,
                    String title, Integer duration, Integer channel) throws Exception;
 
-    List<BiGVideo> list(Integer userId, Integer channel, Integer start, Integer limit);
+    List<BiGVideo> list(String keyword, Integer userId, Integer channel, Integer start, Integer limit);
 
     List<BiGVideo> liked(Integer userId, Integer start, Integer limit);
 
