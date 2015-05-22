@@ -101,7 +101,7 @@ public class VideoCtl {
 
     @RequestMapping("/comment")
     public ModelAndView comment(@RequestParam String commentaryText, @RequestParam Integer videoId,
-                                @RequestParam Integer videoUserId, @RequestParam(required = false) Integer repliedUserId) {
+                                @RequestParam(required = false) Integer videoUserId, @RequestParam(required = false) Integer repliedUserId) {
         ModelAndView mv = new ModelAndView();
         Integer userId = null;
         try {
