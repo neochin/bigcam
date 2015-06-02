@@ -2,12 +2,12 @@ package com.enginecore.bigcam.mng.service.impl;
 
 import com.enginecore.bigcam.core.dao.CommentDao;
 import com.enginecore.bigcam.core.dao.UserPraiseCommentDao;
+import com.enginecore.bigcam.dto.beans.Comment;
 import com.enginecore.bigcam.mng.service.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by yyam on 14-11-19.
@@ -19,24 +19,24 @@ public class CommentServiceImpl implements CommentService {
     @Autowired
     private UserPraiseCommentDao userPraiseCommentDao;
     @Override
-    public List<Map<String, Object>> refresh(Integer userId, Integer videoId, Integer limit) {
-        List<Map<String, Object>> list = commentDao.refresh(videoId, limit);
+    public List<Comment> refresh(Integer userId, Integer videoId, Integer limit) {
+        List<Comment> list = commentDao.refresh(videoId, limit);
         praised(list, userId);
         return list;
     }
     @Override
-    public List<Map<String, Object>> load(Integer userId, Integer videoId, Integer commentId, Integer limit) {
-        List<Map<String, Object>> list = commentDao.load(videoId, commentId, limit);
+    public List<Comment> load(Integer userId, Integer videoId, Integer commentId, Integer limit) {
+        List<Comment> list = commentDao.load(videoId, commentId, limit);
         praised(list, userId);
         return list;
     }
 
-    private void praised(List<Map<String, Object>> comments, Integer userId) {
+    private void praised(List<Comment> comments, Integer userId) {
         if (userId == null) {
             return;
         }
-        for (Map<String, Object> map : comments) {
-            map.put("praised", userPraiseCommentDao.praised(userId, (Integer) map.get("commentId")));
+        for (Comment comment : comments) {
+            comment.setPraised(userPraiseCommentDao.praised(userId, comment.getCommentId()));
         }
     }
 

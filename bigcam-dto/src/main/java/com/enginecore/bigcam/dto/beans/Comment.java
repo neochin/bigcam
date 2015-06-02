@@ -18,10 +18,10 @@ public class Comment {
     private Date commentTime;
 
     private Integer praiseTimes;//评论被赞的次数
+    private Boolean praised;//是否评论过
 
     private String nickname;//评论者的昵称
     private String profilePhoto;
-
     private String repliedNickname;//被回复的用户的昵称
     private String repliedProfilePhoto;
 
@@ -87,6 +87,18 @@ public class Comment {
 
     public void setPraiseTimes(Integer praiseTimes) {
         this.praiseTimes = praiseTimes;
+    }
+
+    public Boolean getPraised() {
+        return praised;
+    }
+
+    public void setPraised(Integer praised) {
+        if (null == praised) {
+            this.praised = false;
+            return;
+        }
+        this.praised = praised > 0;
     }
 
     public String getNickname() {

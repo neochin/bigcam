@@ -14,8 +14,8 @@ import java.util.Map;
 public interface CommentDao {
     void comment(Comment comment);
 
-    List<Map<String, Object>> refresh(@Param("videoId") Integer videoId, @Param("limit") Integer limit);
-    List<Map<String, Object>> load(@Param("videoId") Integer videoId, @Param("commentId") Integer commentId, @Param("limit") Integer limit);
+    List<Comment> refresh(@Param("videoId") Integer videoId, @Param("limit") Integer limit);
+    List<Comment> load(@Param("videoId") Integer videoId, @Param("commentId") Integer commentId, @Param("limit") Integer limit);
 
     void praise(@Param("commentId") Integer commentId, @Param("userId") Integer userId);
 
