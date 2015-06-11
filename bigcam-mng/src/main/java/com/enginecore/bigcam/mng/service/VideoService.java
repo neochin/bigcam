@@ -17,7 +17,7 @@ public interface VideoService {
 
     void persistResult(String persistResult);
 
-    List<BiGVideo> list(String keyword, Integer userId, Integer channel, Integer start, Integer limit);
+    List<BiGVideo> list(String keyword, Integer userId, Integer channel, String videoStatus, Integer start, Integer limit);
 
     List<BiGVideo> liked(Integer userId, Integer start, Integer limit);
 

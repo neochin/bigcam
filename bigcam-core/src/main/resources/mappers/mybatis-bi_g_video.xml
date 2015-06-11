@@ -56,6 +56,9 @@
             <if test="keyword != null">
                 and v.video_title like "%"#{keyword}"%" OR v.video_desc like "%"#{keyword}"%"
             </if>
+            <if test="videoStatus != null and videoStatus != ''">
+                and v.video_status=#{videoStatus}
+            </if>
         </where>
         ORDER BY upload_time
         <if test="start != null">limit #{start}, #{limit}</if>

@@ -75,11 +75,13 @@ public class VideoCtl {
     }
 
     @RequestMapping("list")
-    public ModelAndView list(@RequestParam(required = false) String keyword, @RequestParam(required = false) Integer channel, @RequestParam(defaultValue = "0") Integer start, @RequestParam(defaultValue = "30") Integer limit) {
+    public ModelAndView list(@RequestParam(required = false) String keyword,
+             @RequestParam(required = false) Integer channel, @RequestParam(required = false) String videoStatus,
+             @RequestParam(defaultValue = "0") Integer start, @RequestParam(defaultValue = "30") Integer limit) {
         ModelAndView modelAndView = new ModelAndView();
         Integer userId = SessionManager.getCurrentUserIdIgnoreLogin();
         try {
-            List<BiGVideo> videoList = videoService.list(keyword, userId, channel, start, limit);
+            List<BiGVideo> videoList = videoService.list(keyword, userId, channel, videoStatus, start, limit);
             modelAndView.addObject("data", videoList);
         } catch (Exception e) {
             logger.warn("获取视频列表异常", e);
