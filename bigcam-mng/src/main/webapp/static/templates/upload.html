@@ -1,21 +1,9 @@
 <div class="row" style="margin-top: 25px;">
-    <form class="form-horizontal" action="/video/upload" enctype="multipart/form-data" method="post" id="upload">
+    <form class="form-horizontal" action="/video/upload" method="post" id="upload-meta">
         <div class="form-group">
             <label for="title" class="col-sm-1 control-label">标题</label>
             <div class="col-sm-11">
                 <input type="text" class="form-control" id="title" placeholder="标题" name="title">
-            </div>
-        </div>
-        <div class="form-group">
-            <label for="url" class="col-sm-1 control-label">url</label>
-            <div class="col-sm-11">
-                <input type="text" class="form-control" id="url" placeholder="播放链接" name="url">
-            </div>
-        </div>
-        <div class="form-group">
-            <label for="duration" class="col-sm-1 control-label">时长</label>
-            <div class="col-sm-11">
-                <input type="text" class="form-control" id="duration" placeholder="时长(单位 秒)" name="duration">
             </div>
         </div>
         <div class="form-group">
@@ -30,46 +18,86 @@
                 <textarea class="form-control" rows="3" id="desc" name="videoDesc" style="resize: vertical;"></textarea>
             </div>
         </div>
-        <div class="form-group">
-            <label for="cover" class="col-sm-1 control-label">封面</label>
-            <div class="col-sm-11">
-                <input type="file" id="cover" name="videoCover">
-                <p class="help-block">视频封面，支持png/jpg</p>
-            </div>
-        </div>
-        <div class="form-group">
-            <div class="col-sm-offset-1 col-sm-11">
-                <button type="submit" class="btn btn-success" style="width: 100px;">上传</button>
-            </div>
-        </div>
+        <input type="hidden" class="form-control" id="key" name="videoContent">
+        <input type="hidden" class="form-control" id="bit_rate" name="bitRate">
+        <input type="hidden" class="form-control" id="duration" name="duration">
+        <input type="hidden" class="form-control" id="video_width" name="width">
+        <input type="hidden" class="form-control" id="video_height" name="height">
+        <input type="hidden" class="form-control" id="video_file_size" name="fileSize">
+        <input type="hidden" class="form-control" id="video_codec_name" name="codecName">
+        <input type="hidden" class="form-control" id="video_codec_type" name="codecType">
+        <input type="hidden" class="form-control" id="display_aspect_ratio" name="displayAspectRatio">
     </form>
+    <form class="form-horizontal" action="http://upload.qiniu.com/" enctype="multipart/form-data" method="post" id="upload-file">
+        <div class="form-group">
+            <label for="videoContent" class="col-sm-1 control-label">视频</label>
+            <div class="col-sm-11">
+                <input type="file" id="videoContent" name="file">
+                <p class="help-block">视频源文件，支持mp4/flv...</p>
+            </div>
+            <input id="upload-token" name="token" type="hidden" value="{{uploadToken}}"/>
+        </div>
+
+    </form>
+    <div class="form-group">
+        <div class="col-sm-offset-1 col-sm-11">
+            <button type="button" class="btn btn-success" style="width: 100px;" id="btn-upload">上传</button>
+        </div>
+    </div>
+
 </div>
 
 <script type="application/javascript">
     $(function(){
-        $('#upload').submit(function(e){
+        $('#upload-file').submit(function(e){
             e.preventDefault();
             var formObj = $(this);
+            var data = new FormData();
+            $.each($('#videoContent')[0].files, function(i, file) {
+                data.append('file', file);
+            });
+            data.append('token', $('#upload-token').val());
             $.ajax( {
                 url: formObj.attr('action'),
                 type: formObj.attr('method'),
-                data: new FormData( this ),
+                data: data,
                 processData: false,
                 contentType: false,
-                success: function(data){
-                    if(data.success) {
-                        alert("上传成功！");
-                    } else{
-                        alert("上传失败！");
-                    }
+                error: function(responseObj){
+                    var response = $.parseJSON(responseObj.responseText+'}');
+                    $('#key').val(response.key);
+                    var avinfoVideo = response.avinfo.video;
+                    $('#bit_rate').val(avinfoVideo.bit_rate);
+                    $('#duration').val(avinfoVideo.duration);
+                    $('#video_width').val(avinfoVideo.width);
+                    $('#video_height').val(avinfoVideo.height);
+                    $('#video_codec_name').val(avinfoVideo.codec_name);
+                    $('#video_codec_type').val(avinfoVideo.codec_type);
+                    $('#display_aspect_ratio').val(avinfoVideo.display_aspect_ratio);
+                    $('#video_file_size').val(response.avinfo.format.size);
+                    $('#upload-meta').submit();
                 },
                 statusCode:{
                     403: function () {
                         alert("请登录!");
                         window.location.replace("/login.jsp");
+                    },
+                    200: function(response){
+                        if(response.key) {
+                            alert("上传成功!");
+                        }
+                        console.log("----------response start----------------");
+                        console.log(response);
+                        console.log("----------response end-------------------");
                     }
                 }
             } );
+
+        });
+        $('#btn-upload').on('click', function(){
+            console.log($('#upload-token').val());
+
+            $('#upload-file').submit();
         });
     })
 </script>

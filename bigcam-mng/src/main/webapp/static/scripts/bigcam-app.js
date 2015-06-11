@@ -26,6 +26,11 @@ angular
                         return $http.get('/channel/list').then(function(response){
                             return response.data;
                         });
+                    }],
+                    uploadToken: ['$http', function($http){
+                        return $http.get('/video/uploadToken').then(function(response){
+                            return response.data;
+                        });
                     }]
                 }
             })

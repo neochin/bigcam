@@ -79,6 +79,7 @@
                     <value>/video/refresh</value>
                     <value>/video/load</value>
                     <value>/video/list</value>
+                    <value>/video/persistNotify</value>
                     <value>/video/{videoId}/play</value>
                     <value>/video/{videoId}/like</value>
                     <value>/video/{videoId}/likedUsers</value>

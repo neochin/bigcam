@@ -10,8 +10,12 @@ import java.util.Map;
  * Created by yyam on 15-4-13.
  */
 public interface VideoService {
-    Integer upload(MultipartFile videoCover, String videoDesc, String url,
-                   String title, Integer duration, Integer channel) throws Exception;
+    String uploadToken();
+
+    Integer upload(String videoDesc, String videoContent, String title, Integer duration, Integer channel,
+                   Long bitRate, Integer width, Integer height, Long fileSize, String codecName, String codecType, String displayAspectRatio) throws Exception;
+
+    void persistResult(String persistResult);
 
     List<BiGVideo> list(String keyword, Integer userId, Integer channel, Integer start, Integer limit);
 

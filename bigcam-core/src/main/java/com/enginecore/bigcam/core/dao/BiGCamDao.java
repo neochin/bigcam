@@ -24,4 +24,8 @@ public interface BiGCamDao {
     void unLike(Integer videoId);
 
     void comment(Integer videoId);
+
+    void persistResult(@Param("sourceKey") String sourceKey, @Param("persistKey") String persistKey,
+           @Param("videoCover") String videoCover,
+           @Param("videoStatus") String videoStatus, @Param("videoMsg") String videoMsg);
 }

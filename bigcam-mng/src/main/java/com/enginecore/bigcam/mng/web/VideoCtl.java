@@ -8,6 +8,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
@@ -26,14 +27,44 @@ public class VideoCtl {
     @Autowired
     private VideoService videoService;
 
-    @RequestMapping("upload")
-    public ModelAndView upload(@RequestParam(value = "videoCover", required = false) MultipartFile videoCover,
-           @RequestParam(value = "videoDesc", required = false) String videoDesc,
-           @RequestParam(required = false) String url, @RequestParam(required = false) String title,
-           @RequestParam(required = false) Integer duration, @RequestParam(required = false) Integer channel) {
+    @RequestMapping("uploadToken")
+    public ModelAndView getUploadToken() {
         ModelAndView modelAndView = new ModelAndView();
         try {
-            Integer videoId = videoService.upload(videoCover, videoDesc, url, title, duration, channel);
+//            modelAndView.addObject("success", Boolean.TRUE);
+            modelAndView.addObject("token", videoService.uploadToken());
+        } catch (Exception e) {
+            modelAndView.addObject("success", Boolean.FALSE);
+            logger.warn("获取上传令牌出现异常", e);
+        }
+        return modelAndView;
+    }
+
+    @RequestMapping("persistNotify")
+    public ModelAndView persistNotify(@RequestBody String persistResult) {
+        ModelAndView modelAndView = new ModelAndView();
+        try {
+            videoService.persistResult(persistResult);
+            modelAndView.addObject("success", Boolean.TRUE);
+        } catch (Exception e) {
+            modelAndView.addObject("success", Boolean.FALSE);
+            logger.warn("处理七牛处理完成通知出现异常", e);
+        }
+        return modelAndView;
+    }
+
+    @RequestMapping("upload")
+    public ModelAndView upload(@RequestParam(value = "videoDesc", required = false) String videoDesc,
+           @RequestParam(required = false) String videoContent, @RequestParam(required = false) String title,
+           @RequestParam(required = false) Double duration, @RequestParam(required = false) Integer channel,
+           @RequestParam(required = false) Integer width, @RequestParam(required = false) Integer height,
+           @RequestParam(required = false) Long bitRate, @RequestParam(required = false) Long fileSize,
+           @RequestParam(required = false) String codecName, @RequestParam(required = false) String codecType,
+           @RequestParam(required = false) String displayAspectRatio) {
+        ModelAndView modelAndView = new ModelAndView();
+        try {
+            Integer videoId = videoService.upload(videoDesc, videoContent, title, duration.intValue(),
+                    channel, bitRate, width, height, fileSize, codecName, codecType, displayAspectRatio);
             modelAndView.addObject("success", Boolean.TRUE);
             modelAndView.addObject("videoId", videoId);
         } catch (Exception e) {

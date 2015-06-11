@@ -4,33 +4,49 @@
 
     <insert id="save" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO qh_video (user_id, uuid, video_cover, video_desc, channel_id, video_title, video_duration,
-        video_url, like_times, play_times, comment_times, share_times, store_times, upload_time)
+        video_content, bit_rate, like_times, play_times, comment_times, share_times, store_times, video_width,
+        video_height, video_file_size, video_codec_name, video_codec_type, video_status, display_aspect_ratio, upload_time)
 
-        VALUES (#{userId}, #{uuid}, #{cover}, #{desc}, #{channel}, #{title}, #{duration},
-        #{url}, #{likeTimes}, #{playTimes}, #{commentTimes}, #{shareTimes}, #{storeTimes}, now())
+        VALUES (#{userId}, #{uuid}, #{videoCover}, #{desc}, #{channel}, #{title}, #{duration},
+        #{videoContent}, #{bitRate}, #{likeTimes}, #{playTimes}, #{commentTimes}, #{shareTimes}, #{storeTimes}, #{width},
+        #{height}, #{fileSize}, #{codecName}, #{codecType}, #{status}, #{displayAspectRatio}, now())
     </insert>
+
+    <update id="persistResult">
+        update qh_video
+        set video_status=#{videoStatus},video_msg=#{videoMsg}
+        <if test="videoCover != null and videoCover != ''">
+            ,video_cover=#{videoCover}
+        </if>
+        <if test="persistKey != null and persistKey != ''">
+            ,video_content=#{persistKey}
+        </if>
+        where video_content=#{sourceKey}
+    </update>
 
     <resultMap id="biGVideo" type="com.enginecore.bigcam.dto.beans.BiGVideo">
         <id column="video_id" property="id"/>
         <result column="user_id" property="userId"/>
         <result column="uuid" property="uuid"/>
-        <result column="video_cover" property="cover"/>
+        <result column="video_cover" property="videoCover"/>
         <result column="video_desc" property="desc"/>
+        <result column="bit_rate" property="bitRate"/>
         <result column="channel_text" property="channelText"/>
         <result column="video_title" property="title"/>
         <result column="video_duration" property="duration"/>
-        <result column="video_url" property="url"/>
+        <result column="video_content" property="videoContent"/>
         <result column="like_times" property="likeTimes"/>
         <result column="play_times" property="playTimes"/>
         <result column="comment_times" property="commentTimes"/>
         <result column="share_times" property="shareTimes"/>
         <result column="store_times" property="storeTimes"/>
+        <result column="video_status" property="status"/>
         <result column="upload_time" property="uploadTime"/>
     </resultMap>
 
     <select id="list" resultMap="biGVideo">
         SELECT user_id, uuid, video_cover, video_desc, c.channel_text as channel_text, video_title, video_duration,
-        video_url, like_times, play_times, comment_times, share_times, store_times, upload_time, video_id
+        video_content, like_times, play_times, comment_times, share_times, store_times, upload_time, video_id, bit_rate, video_status
         FROM qh_video v JOIN qh_channel c
         ON v.channel_id=c.channel_id
         <where>
@@ -47,7 +63,7 @@
 
     <select id="liked" resultMap="biGVideo">
         SELECT user_id, uuid, video_cover, video_desc, video_title, video_duration,
-        video_url, like_times, play_times, comment_times, share_times, store_times, upload_time
+        video_content, like_times, play_times, comment_times, share_times, store_times, upload_time, bit_rate, video_status
         FROM qh_video v JOIN qh_user_like_video qulv
         ON v.video_id=qulv.video_id
         AND qulv.user_id=#{userId}

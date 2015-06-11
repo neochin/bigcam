@@ -1,5 +1,8 @@
 package com.enginecore.bigcam.mng.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.enginecore.bigcam.core.dao.BiGCamDao;
 import com.enginecore.bigcam.core.dao.CommentDao;
 import com.enginecore.bigcam.core.dao.UserLikeVideoDao;
@@ -9,6 +12,10 @@ import com.enginecore.bigcam.dto.beans.BiGVideo;
 import com.enginecore.bigcam.dto.beans.Comment;
 import com.enginecore.bigcam.mng.service.GridFSService;
 import com.enginecore.bigcam.mng.service.VideoService;
+import com.qiniu.processing.OperationManager;
+import com.qiniu.storage.UploadManager;
+import com.qiniu.util.Auth;
+import com.qiniu.util.StringMap;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -34,44 +41,102 @@ public class VideoServiceImpl implements VideoService{
     private UserPlayVideoDao userPlayVideoDao;
     @Autowired
     private CommentDao commentDao;
-    @Autowired
-    private GridFSService gridFSService;
 
     @Value("${mongo.video_cover}")
     private String videoCoverBucket;
+    @Value("${bigcam.qiniu.access_key}")
+    private String accessKey;
+    @Value("${bigcam.qiniu.secret_key}")
+    private String secretKey;
+    @Value("${bigcam.qiniu.video_bucket}")
+    private String videoBucket;
+
+    @Value("${bigcam.qiniu.max_bit_rate}")
+    private Long maxBitRate;
+    @Value("${bigcam.qiniu.force_persist}")
+    private Boolean forcePersist;
+    @Value("${bigcam.qiniu.pipeline}")
+    private String pipeline;
+    @Value("${bigcam.qiniu.notifyURL}")
+    private String notifyURL;
+    @Value("${bigcam.qiniu.dest_video_format}")
+    private String destVideoFormat;
 
     @Override
-    public Integer upload(MultipartFile videoCover, String videoDesc, String url,
-                          String title, Integer duration, Integer channel) throws Exception{
+    public String uploadToken() {
+        return Auth.create(accessKey, secretKey).uploadToken(videoBucket, null, 3600, new StringMap().put("returnBody", "{\"key\": $(key), \"hash\": $(etag), \"avinfo\": $(avinfo)"));
+    }
+
+    @Override
+    public Integer upload(String videoDesc, String videoContent, String title, Integer duration, Integer channel,
+        Long bitRate, Integer width, Integer height, Long fileSize, String codecName, String codecType, String displayAspectRatio) throws Exception{
         String uuid = UUIDGenerator.generate();
-        String coverFilename = "";
-        String fileSuffix = "";
-        if (videoCover != null) {
-            fileSuffix = StringUtils.substringAfterLast(videoCover.getOriginalFilename(), ".");
-            coverFilename = "cover_" + uuid + "." + fileSuffix;
-        }
+
         try {
-            if (videoCover != null) {
-                gridFSService.uploadFileToGridFS(videoCover.getInputStream(), coverFilename, videoCoverBucket);
-            }
             BiGVideo biGVideo = new BiGVideo();
-            biGVideo.setUrl(url);
-            biGVideo.setChannel(channel);
-            biGVideo.setCommentTimes(0);
-            biGVideo.setCover(coverFilename);
+            biGVideo.setUuid(uuid);
             biGVideo.setDesc(videoDesc);
+            biGVideo.setVideoContent(videoContent);
+            biGVideo.setTitle(title);
             biGVideo.setDuration(duration);
+            biGVideo.setChannel(channel);
+            biGVideo.setBitRate(bitRate);
+            biGVideo.setWidth(width);
+            biGVideo.setHeight(height);
+            biGVideo.setFileSize(fileSize);
+            biGVideo.setCodecName(codecName);
+            biGVideo.setCodecType(codecType);
+            biGVideo.setDisplayAspectRatio(displayAspectRatio);
+            biGVideo.setStatus(BiGVideo.VIDEO_STATUS_PERSIST);
+
+            biGVideo.setCommentTimes(0);
             biGVideo.setLikeTimes(0);
             biGVideo.setPlayTimes(0);
-            biGVideo.setTitle(title);
+            StringBuffer persistOps = new StringBuffer("avthumb/");
+            persistOps.append(destVideoFormat);
+            if (width > 1280 || height > 720) {
+                persistOps.append("/s/1280x720/autoscale/1");
+            }
+            persistOps.append("/aspect/").append(displayAspectRatio);
+            if (bitRate > maxBitRate) {
+                persistOps.append("/vb/").append(maxBitRate);
+            }
+            persistOps.append(";");
+            persistOps.append("vframe/png/offset/10");
+            OperationManager operationManager = new OperationManager(Auth.create(accessKey, secretKey));
+            operationManager.pfop(videoBucket, videoContent, persistOps.toString(),
+                    new StringMap().putNotEmpty("notifyURL", notifyURL).putWhen("force", 1, forcePersist).putNotEmpty("pipeline", pipeline));
             biGCamDao.save(biGVideo);
             return biGVideo.getId();
         }  catch (Exception e){
             logger.warn("上传视频出现异常", e);
             //任何步骤出现异常，都尝试删除已经上传的文件
-            gridFSService.removeFile(coverFilename, videoCoverBucket);
             throw new Exception("上传视频出现异常", e);
         }
+    }
+
+    @Override
+    public void persistResult(String persistResult) {
+        logger.info("处理结果:" + System.getProperty("line.separator") + persistResult);
+        JSONObject json = JSON.parseObject(persistResult);
+        String source = json.getString("inputKey");
+        JSONArray items = json.getJSONArray("items");
+        JSONObject item1 = items.getJSONObject(0);
+        JSONObject item2 = items.getJSONObject(1);
+        String persistStatus = BiGVideo.VIDEO_STATUS_COMPLETE;
+        String persistMsg = item1.getString("desc");
+        String persistKey = null;
+        if (item1.getInteger("code") != 0) {//转码失败
+            persistStatus = BiGVideo.VIDEO_STATUS_FAILED;
+            persistMsg = item1.getString("error");
+        } else {//转码成功
+            persistKey = item1.getString("key");
+        }
+        String cover = null;
+        if (item2.getInteger("code") == 0) {//截图成功
+            cover = item2.getString("key");
+        }
+        biGCamDao.persistResult(source, persistKey, cover, persistStatus, persistMsg);
     }
 
     @Override
