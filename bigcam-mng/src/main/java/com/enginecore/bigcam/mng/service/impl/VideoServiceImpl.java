@@ -10,19 +10,16 @@ import com.enginecore.bigcam.core.dao.UserPlayVideoDao;
 import com.enginecore.bigcam.core.util.UUIDGenerator;
 import com.enginecore.bigcam.dto.beans.BiGVideo;
 import com.enginecore.bigcam.dto.beans.Comment;
-import com.enginecore.bigcam.mng.service.GridFSService;
 import com.enginecore.bigcam.mng.service.VideoService;
 import com.qiniu.processing.OperationManager;
-import com.qiniu.storage.UploadManager;
 import com.qiniu.util.Auth;
+import com.qiniu.util.Base64;
 import com.qiniu.util.StringMap;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
@@ -42,34 +39,36 @@ public class VideoServiceImpl implements VideoService{
     @Autowired
     private CommentDao commentDao;
 
-    @Value("${mongo.video_cover}")
-    private String videoCoverBucket;
     @Value("${bigcam.qiniu.access_key}")
     private String accessKey;
     @Value("${bigcam.qiniu.secret_key}")
     private String secretKey;
-    @Value("${bigcam.qiniu.video_bucket}")
-    private String videoBucket;
+    @Value("${bigcam.qiniu.video_source_bucket}")
+    private String sourceBucket;
+    @Value("${bigcam.qiniu.video_persist_bucket}")
+    private String persistBucket;
+    @Value("${bigcam.qiniu.cover_bucket}")
+    private String coverBucket;
 
-    @Value("${bigcam.qiniu.max_bit_rate}")
+    @Value("${bigcam.qiniu.video.max_bit_rate}")
     private Long maxBitRate;
-    @Value("${bigcam.qiniu.force_persist}")
+    @Value("${bigcam.qiniu.video.force_persist}")
     private Boolean forcePersist;
-    @Value("${bigcam.qiniu.pipeline}")
+    @Value("${bigcam.qiniu.video.pipeline}")
     private String pipeline;
-    @Value("${bigcam.qiniu.notifyURL}")
+    @Value("${bigcam.qiniu.video.notifyURL}")
     private String notifyURL;
-    @Value("${bigcam.qiniu.dest_video_format}")
+    @Value("${bigcam.qiniu.video.dest_video_format}")
     private String destVideoFormat;
 
     @Override
     public String uploadToken() {
-        return Auth.create(accessKey, secretKey).uploadToken(videoBucket, null, 3600, new StringMap().put("returnBody", "{\"key\": $(key), \"hash\": $(etag), \"avinfo\": $(avinfo)"));
+        return Auth.create(accessKey, secretKey).uploadToken(sourceBucket, null, 3600, new StringMap().put("returnBody", "{\"key\": $(key), \"hash\": $(etag), \"avinfo\": $(avinfo)"));
     }
 
     @Override
     public Integer upload(String videoDesc, String videoContent, String title, Integer duration, Integer channel,
-        Long bitRate, Integer width, Integer height, Long fileSize, String codecName, String codecType, String displayAspectRatio) throws Exception{
+        Long bitRate, Integer width, Integer height, Long fileSize, String codecName, String codecType, String displayAspectRatio, Long frameOffset) throws Exception{
         String uuid = UUIDGenerator.generate();
 
         try {
@@ -101,10 +100,11 @@ public class VideoServiceImpl implements VideoService{
             if (bitRate > maxBitRate) {
                 persistOps.append("/vb/").append(maxBitRate);
             }
+            persistOps.append("|saveas/").append(Base64.encodeToString(persistBucket.getBytes("UTF-8"), 0));
             persistOps.append(";");
-            persistOps.append("vframe/png/offset/10");
+            persistOps.append("vframe/png/offset/").append(frameOffset).append("|saveas/").append(Base64.encodeToString(coverBucket.getBytes("UTF-8"), 0));
             OperationManager operationManager = new OperationManager(Auth.create(accessKey, secretKey));
-            operationManager.pfop(videoBucket, videoContent, persistOps.toString(),
+            operationManager.pfop(sourceBucket, videoContent, persistOps.toString(),
                     new StringMap().putNotEmpty("notifyURL", notifyURL).putWhen("force", 1, forcePersist).putNotEmpty("pipeline", pipeline));
             biGCamDao.save(biGVideo);
             return biGVideo.getId();

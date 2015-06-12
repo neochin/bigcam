@@ -5,17 +5,17 @@ import com.enginecore.bigcam.core.dao.UserDao;
 import com.enginecore.bigcam.core.util.EncryptUtil;
 import com.enginecore.bigcam.core.util.Gender;
 import com.enginecore.bigcam.dto.beans.User;
-import com.enginecore.bigcam.mng.service.GridFSService;
 import com.enginecore.bigcam.mng.service.UserService;
+import com.qiniu.util.Auth;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Map;
+import java.util.Random;
 
 /**
  * Created by yyam on 14-11-7.
@@ -26,12 +26,13 @@ public class UserServiceImpl implements UserService {
     private UserDao userDao;
     @Autowired
     private SignatureDao signatureDao;
-    @Value("${mongo.user_profile_photo}")
-    private String userProfilePhoto;
-    @Autowired
-    private GridFSService gridFSService;
+    @Value("${bigcam.qiniu.access_key}")
+    private String accessKey;
+    @Value("${bigcam.qiniu.secret_key}")
+    private String secretKey;
+    @Value("${bigcam.qiniu.photo_bucket}")
+    private String photoBucket;
 
-    private Random random = null;
     @Override
     public User login(String username, String accessToken) throws Exception {
         //password = EncryptUtil.md5(password);
@@ -121,12 +122,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String uploadProfilePhoto(MultipartFile profilePhoto, Integer userId) throws IOException {
-        String fileSuffix = StringUtils.substringAfterLast(profilePhoto.getOriginalFilename(), ".");
-        String profilePhotoName = "profile_" + userId + "." + fileSuffix;
-        gridFSService.uploadFileToGridFS(profilePhoto.getInputStream(), profilePhotoName, userProfilePhoto);
-        userDao.setProfilePhoto(profilePhotoName, userId);
-        return profilePhotoName;
+    public String uploadToken() {
+        return Auth.create(accessKey, secretKey).uploadToken(photoBucket);
+    }
+
+    @Override
+    public void uploadProfilePhoto(String profilePhoto, Integer userId) throws IOException {
+        userDao.setProfilePhoto(profilePhoto, userId);
     }
 
     @Override

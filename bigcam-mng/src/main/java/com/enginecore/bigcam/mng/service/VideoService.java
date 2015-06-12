@@ -13,7 +13,7 @@ public interface VideoService {
     String uploadToken();
 
     Integer upload(String videoDesc, String videoContent, String title, Integer duration, Integer channel,
-                   Long bitRate, Integer width, Integer height, Long fileSize, String codecName, String codecType, String displayAspectRatio) throws Exception;
+                   Long bitRate, Integer width, Integer height, Long fileSize, String codecName, String codecType, String displayAspectRatio, Long frameOffset) throws Exception;
 
     void persistResult(String persistResult);
 

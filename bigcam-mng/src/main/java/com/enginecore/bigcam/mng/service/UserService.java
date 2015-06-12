@@ -31,7 +31,9 @@ public interface UserService {
      */
     Map<String, Object> viewUserProfile(Integer userId, Integer currUserId);
 
-    String uploadProfilePhoto(MultipartFile profilePhoto, Integer userId) throws IOException;
+    String uploadToken();
+
+    void uploadProfilePhoto(String profilePhoto, Integer userId) throws IOException;
 
     void updateNickname(String nickname, Integer userId);
 

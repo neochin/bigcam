@@ -136,14 +136,26 @@ public class UserMngCtl {
         return mv;
     }
 
-    @RequestMapping("/profilePhoto")
-    public ModelAndView profilePhoto(@RequestParam("profilePhoto") MultipartFile profilePhoto) {
+    @RequestMapping("/photoToken")
+    public ModelAndView photoToken() {
         ModelAndView mv = new ModelAndView();
         Integer userId = SessionManager.getCurrentUserId();
         try {
-            String profilePhotoFilename = userService.uploadProfilePhoto(profilePhoto, userId);
+            mv.addObject("success", userService.uploadToken());
+        } catch (Exception e) {
+            mv.addObject("success", Boolean.FALSE);
+            logger.warn("获取头像uploadToken异常，用户：[" + userId + "]", e);
+        }
+        return mv;
+    }
+
+    @RequestMapping("/profilePhoto")
+    public ModelAndView profilePhoto(@RequestParam("profilePhoto") String profilePhoto) {
+        ModelAndView mv = new ModelAndView();
+        Integer userId = SessionManager.getCurrentUserId();
+        try {
+            userService.uploadProfilePhoto(profilePhoto, userId);
             mv.addObject("success", Boolean.TRUE);
-            mv.addObject("profilePhoto", profilePhotoFilename);
         } catch (IOException e) {
             mv.addObject("success", Boolean.FALSE);
             logger.warn("上传头像异常，用户：[" + userId + "]", e);

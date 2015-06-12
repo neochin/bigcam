@@ -7,6 +7,12 @@
             </div>
         </div>
         <div class="form-group">
+            <label for="frameOffset" class="col-sm-1 control-label">截图</label>
+            <div class="col-sm-11">
+                <input type="text" class="form-control" id="frameOffset" placeholder="截图视频秒数，正整数，默认15" name="frameOffset">
+            </div>
+        </div>
+        <div class="form-group">
             <label for="channel" class="col-sm-1 control-label">频道</label>
             <div class="col-sm-11">
                 <select class="form-control" name="channel" id="channel" ng-model="selectedValue" ng-options="channel.text for channel in channels track by channel.value"></select>
@@ -81,14 +87,6 @@
                     403: function () {
                         alert("请登录!");
                         window.location.replace("/login.jsp");
-                    },
-                    200: function(response){
-                        if(response.key) {
-                            alert("上传成功!");
-                        }
-                        console.log("----------response start----------------");
-                        console.log(response);
-                        console.log("----------response end-------------------");
                     }
                 }
             } );

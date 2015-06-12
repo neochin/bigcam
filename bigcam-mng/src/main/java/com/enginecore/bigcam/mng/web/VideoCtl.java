@@ -60,11 +60,11 @@ public class VideoCtl {
            @RequestParam(required = false) Integer width, @RequestParam(required = false) Integer height,
            @RequestParam(required = false) Long bitRate, @RequestParam(required = false) Long fileSize,
            @RequestParam(required = false) String codecName, @RequestParam(required = false) String codecType,
-           @RequestParam(required = false) String displayAspectRatio) {
+           @RequestParam(required = false) String displayAspectRatio, @RequestParam(required = false, defaultValue = "15") Long frameOffset) {
         ModelAndView modelAndView = new ModelAndView();
         try {
             Integer videoId = videoService.upload(videoDesc, videoContent, title, duration.intValue(),
-                    channel, bitRate, width, height, fileSize, codecName, codecType, displayAspectRatio);
+                    channel, bitRate, width, height, fileSize, codecName, codecType, displayAspectRatio, frameOffset);
             modelAndView.addObject("success", Boolean.TRUE);
             modelAndView.addObject("videoId", videoId);
         } catch (Exception e) {
