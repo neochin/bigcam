@@ -48,7 +48,7 @@
         contentType: false,
         success: function(data){
           if(data.success) {
-            window.location.replace("/");
+            window.location.replace("/index.jsp");
           } else{
             alert(data.msg);
           }

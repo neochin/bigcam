@@ -11,8 +11,5 @@
         FROM qh_user_suggestion qus JOIN qh_user qu
         ON qus.user_id=qu.user_id
         ORDER BY suggest_time DESC
-        <if test="start != null">
-            limit #{start},#{limit}
-        </if>
     </select>
 </mapper>

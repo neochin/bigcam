@@ -37,14 +37,17 @@
     <form class="form-horizontal" action="http://upload.qiniu.com/" enctype="multipart/form-data" method="post" id="upload-file">
         <div class="form-group">
             <label for="videoContent" class="col-sm-1 control-label">视频</label>
-            <div class="col-sm-11">
+            <div class="col-sm-6">
                 <input type="file" id="videoContent" name="file">
                 <p class="help-block">视频源文件，支持mp4/flv...</p>
             </div>
-            <input id="upload-token" name="token" type="hidden" value="{{uploadToken}}"/>
+            <div class="col-sm-5" style="display: none;height: 50px;" id="process-uploading">
+                <img src="/static/images/loading.gif" style="height: 50px;">
+                <span>上传中...</span>
+            </div>
         </div>
-
     </form>
+    <input id="upload-token" name="token" type="hidden" value="{{uploadToken}}"/>
     <div class="form-group">
         <div class="col-sm-offset-1 col-sm-11">
             <button type="button" class="btn btn-success" style="width: 100px;" id="btn-upload">上传</button>
@@ -55,6 +58,26 @@
 
 <script type="application/javascript">
     $(function(){
+        $('#upload-meta').submit(function(e) {
+            e.preventDefault();
+            var formObj = $(this);
+            var data = new FormData(this);
+            $.ajax({
+                url: formObj.attr('action'),
+                type: formObj.attr('method'),
+                data: data,
+                processData: false,
+                contentType: false,
+                success:function(response) {
+                    alert("上传完成！");
+                    console.log(response);response
+                    $('#process-uploading').hide();
+                    $('#btn-upload').addClass('btn-success');
+                    $('#btn-upload').removeAttr('disabled');
+                    $('form').trigger('reset');
+                }
+            });
+        });
         $('#upload-file').submit(function(e){
             e.preventDefault();
             var formObj = $(this);
@@ -70,6 +93,8 @@
                 processData: false,
                 contentType: false,
                 error: function(responseObj){
+                    $('#process-uploading span').html('已上传到七牛，提交我们的服务器...');
+
                     var response = $.parseJSON(responseObj.responseText+'}');
                     $('#key').val(response.key);
                     var avinfoVideo = response.avinfo.video;
@@ -94,7 +119,10 @@
         });
         $('#btn-upload').on('click', function(){
             console.log($('#upload-token').val());
-
+            $('#process-uploading span').html('上传中...');
+            $('#process-uploading').show();
+            $(this).removeClass('btn-success');
+            $(this).attr('disabled','disabled');
             $('#upload-file').submit();
         });
     })

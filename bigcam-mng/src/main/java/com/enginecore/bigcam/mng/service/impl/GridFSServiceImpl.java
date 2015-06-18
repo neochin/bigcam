@@ -16,7 +16,7 @@ import java.io.InputStream;
 /**
  * Created by yyam on 14-11-18.
  */
-@Service
+//@Service
 public class GridFSServiceImpl implements GridFSService {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
     @Autowired

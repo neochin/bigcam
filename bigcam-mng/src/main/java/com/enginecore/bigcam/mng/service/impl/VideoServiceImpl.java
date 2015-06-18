@@ -11,6 +11,8 @@ import com.enginecore.bigcam.core.util.UUIDGenerator;
 import com.enginecore.bigcam.dto.beans.BiGVideo;
 import com.enginecore.bigcam.dto.beans.Comment;
 import com.enginecore.bigcam.mng.service.VideoService;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.qiniu.processing.OperationManager;
 import com.qiniu.util.Auth;
 import com.qiniu.util.Base64;
@@ -21,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Map;
 
@@ -70,7 +73,6 @@ public class VideoServiceImpl implements VideoService{
     public Integer upload(String videoDesc, String videoContent, String title, Integer duration, Integer channel,
         Long bitRate, Integer width, Integer height, Long fileSize, String codecName, String codecType, String displayAspectRatio, Long frameOffset) throws Exception{
         String uuid = UUIDGenerator.generate();
-
         try {
             BiGVideo biGVideo = new BiGVideo();
             biGVideo.setUuid(uuid);
@@ -116,6 +118,11 @@ public class VideoServiceImpl implements VideoService{
     }
 
     @Override
+    public void delete(Integer videoId) {
+        biGCamDao.delete(videoId);
+    }
+
+    @Override
     public void persistResult(String persistResult) {
         logger.info("处理结果:" + System.getProperty("line.separator") + persistResult);
         JSONObject json = JSON.parseObject(persistResult);
@@ -140,17 +147,19 @@ public class VideoServiceImpl implements VideoService{
     }
 
     @Override
-    public List<BiGVideo> list(String keyword, Integer userId, Integer channel, String videoStatus, Integer start, Integer limit) {
-        List<BiGVideo> list = biGCamDao.list(keyword, videoStatus, channel, start, limit);
-        addLiked4List(list, userId);
-        return list;
+    public List<BiGVideo> list(String keyword, Integer userId, Integer channel, String videoStatus, Integer pageNum, Integer pageSize) {
+        Page<BiGVideo> page = PageHelper.startPage(pageNum, pageSize);
+        biGCamDao.list(keyword, videoStatus, channel);
+        addLiked4List(page.getResult(), userId);
+        return page.getResult();
     }
 
     @Override
-    public List<BiGVideo> liked(Integer userId, Integer start, Integer limit) {
-        List<BiGVideo> list = biGCamDao.liked(userId, start, limit);
-        addLiked4List(list, userId);
-        return list;
+    public List<BiGVideo> liked(Integer userId, Integer pageNum, Integer pageSize) {
+        Page<BiGVideo> page = PageHelper.startPage(pageNum, pageSize);
+        biGCamDao.liked(userId);
+        addLiked4List(page.getResult(), userId);
+        return page.getResult();
     }
 
     private void addLiked4List(List<BiGVideo> list, Integer userId) {
@@ -202,7 +211,9 @@ public class VideoServiceImpl implements VideoService{
     }
 
     @Override
-    public List<Map<String, Object>> likedUsers(Integer videoId, Integer start, Integer limit) {
-        return userLikeVideoDao.likedUsers(videoId, start, limit);
+    public List<Map<String, Object>> likedUsers(Integer videoId, Integer pageNum, Integer pageSize) {
+        Page<Map<String, Object>> page = PageHelper.startPage(pageNum, pageSize);
+        userLikeVideoDao.likedUsers(videoId);
+        return page.getResult();
     }
 }

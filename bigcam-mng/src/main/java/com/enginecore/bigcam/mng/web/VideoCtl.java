@@ -31,11 +31,23 @@ public class VideoCtl {
     public ModelAndView getUploadToken() {
         ModelAndView modelAndView = new ModelAndView();
         try {
-//            modelAndView.addObject("success", Boolean.TRUE);
             modelAndView.addObject("token", videoService.uploadToken());
         } catch (Exception e) {
             modelAndView.addObject("success", Boolean.FALSE);
             logger.warn("获取上传令牌出现异常", e);
+        }
+        return modelAndView;
+    }
+
+    @RequestMapping("delete/{videoId}")
+    public ModelAndView delete(@PathVariable Integer videoId) {
+        ModelAndView modelAndView = new ModelAndView();
+        try {
+            videoService.delete(videoId);
+            modelAndView.addObject("success", Boolean.TRUE);
+        } catch (Exception e) {
+            modelAndView.addObject("success", Boolean.FALSE);
+            logger.warn("删除视频出现异常", e);
         }
         return modelAndView;
     }
@@ -77,11 +89,11 @@ public class VideoCtl {
     @RequestMapping("list")
     public ModelAndView list(@RequestParam(required = false) String keyword,
              @RequestParam(required = false) Integer channel, @RequestParam(required = false) String videoStatus,
-             @RequestParam(defaultValue = "0") Integer start, @RequestParam(defaultValue = "30") Integer limit) {
+             @RequestParam(defaultValue = "1") Integer pageNum, @RequestParam(defaultValue = "30") Integer pageSize) {
         ModelAndView modelAndView = new ModelAndView();
         Integer userId = SessionManager.getCurrentUserIdIgnoreLogin();
         try {
-            List<BiGVideo> videoList = videoService.list(keyword, userId, channel, videoStatus, start, limit);
+            List<BiGVideo> videoList = videoService.list(keyword, userId, channel, videoStatus, pageNum, pageSize);
             modelAndView.addObject("data", videoList);
         } catch (Exception e) {
             logger.warn("获取视频列表异常", e);
@@ -156,10 +168,10 @@ public class VideoCtl {
     }
 
     @RequestMapping("{videoId}/likedUsers")
-    public ModelAndView likedUsers(@PathVariable Integer videoId, @RequestParam(defaultValue = "0") Integer start, @RequestParam(defaultValue = "10") Integer limit) {
+    public ModelAndView likedUsers(@PathVariable Integer videoId, @RequestParam(defaultValue = "0") Integer pageNum, @RequestParam(defaultValue = "10") Integer pageSize) {
         ModelAndView modelAndView = new ModelAndView();
         try {
-            List<Map<String, Object>> likedUsers = videoService.likedUsers(videoId, start, limit);
+            List<Map<String, Object>> likedUsers = videoService.likedUsers(videoId, pageNum, pageSize);
             modelAndView.addObject("data", likedUsers);
         } catch (Exception e) {
             modelAndView.addObject("success", Boolean.FALSE);
@@ -169,11 +181,11 @@ public class VideoCtl {
     }
 
     @RequestMapping("likedVideos")
-    public ModelAndView likedVideos(@RequestParam(defaultValue = "0") Integer start, @RequestParam(defaultValue = "30") Integer limit) {
+    public ModelAndView likedVideos(@RequestParam(defaultValue = "0") Integer pageNum, @RequestParam(defaultValue = "30") Integer pageSize) {
         ModelAndView modelAndView = new ModelAndView();
         Integer userId = SessionManager.getCurrentUserId();
         try {
-            List<BiGVideo> biGVideos = videoService.liked(userId, start, limit);
+            List<BiGVideo> biGVideos = videoService.liked(userId, pageNum, pageSize);
             modelAndView.addObject("data", biGVideos);
         } catch (Exception e) {
             modelAndView.addObject("success", Boolean.FALSE);

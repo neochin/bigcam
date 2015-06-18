@@ -3,20 +3,22 @@
         <table class="table table-striped">
             <thead>
                 <th style="width: 7%;">频道</th>
-                <th style="width: 10%;">时长(s)</th>
-                <th style="width: 16%;">播放链接</th>
-                <th style="width: 22%;">标题</th>
+                <th style="width: 8%;">时长(s)</th>
+                <th style="width: 14%;">播放链接</th>
+                <th style="width: 22%;">标题(点击标题查看封面)</th>
                 <th style="width: 15%;">上传时间</th>
                 <th style="width: 30%;">描述</th>
+                <th style="width: 5%;"></th>
             </thead>
             <tbody>
                 <tr ng-repeat="biGCam in biGCams">
                     <td>{{biGCam.channelText}}</td>
                     <td>{{biGCam.duration}}</td>
-                    <td>{{biGCam.url}}</td>
-                    <td>{{biGCam.title}}({{biGCam.status}})</td>
+                    <td>{{biGCam.videoContent}}</td>
+                    <td><a ng-href="http://7xjp7l.dl1.z0.glb.clouddn.com/{{biGCam.videoCover}}" target="_blank">{{biGCam.title}}</a>({{biGCam.status}})</td>
                     <td>{{biGCam.uploadTime}}</td>
                     <td>{{biGCam.desc}}</td>
+                    <td><button type="button" class="btn btn-link" ng-click="deleteVideo($index)">删除</button></td>
                 </tr>
             </tbody>
         </table>
@@ -26,8 +28,8 @@
     <div class="col-sm-12">
         <nav>
             <ul class="pager">
-                <li class="previous"><a href="#"><span aria-hidden="true">&larr;</span> Older</a></li>
-                <li class="next"><a href="#">Newer <span aria-hidden="true">&rarr;</span></a></li>
+                <li class="previous {{currPageDisabled}}"><a href="#" ng-click="older()"><span aria-hidden="true">&larr;</span> Older</a></li>
+                <li class="next {{nextPageDisabled}}"><a href="#" ng-click="newer()">Newer <span aria-hidden="true">&rarr;</span></a></li>
             </ul>
         </nav>
     </div>

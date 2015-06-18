@@ -40,7 +40,7 @@ angular
                 controller: 'listCtrl',
                 resolve: {
                     biGCams: ['$http', function($http){
-                        return $http.get('/video/list?start=0&limit=30').then(function(response) {
+                        return $http.get('/video/list?start=1&limit=2').then(function(response) {
                             return response.data;
                         })
                     }]

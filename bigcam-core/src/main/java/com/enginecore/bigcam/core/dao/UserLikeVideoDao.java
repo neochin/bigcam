@@ -17,5 +17,5 @@ public interface UserLikeVideoDao {
 
     Integer liked(@Param("userId") Integer userId, @Param("videoId") Integer videoId);
 
-    List<Map<String, Object>> likedUsers(@Param("videoId") Integer videoId, @Param("start") Integer start, @Param("limit") Integer limit);
+    List<Map<String, Object>> likedUsers(@Param("videoId") Integer videoId);
 }

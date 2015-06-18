@@ -9,5 +9,5 @@ import java.util.Map;
 public interface SuggestionService {
     void suggest(Integer userId, String userEmail, String userSuggestion);
 
-    List<Map<String, Object>> list(Integer start, Integer limit);
+    List<Map<String, Object>> list(Integer pageNum, Integer pageSize);
 }

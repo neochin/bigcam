@@ -14,5 +14,5 @@ import java.util.Map;
 public interface UserSuggestionDao {
     void suggest(UserSuggestion userSuggestion);
 
-    List<Map<String, Object>> list(@Param("start") Integer start, @Param("limit") Integer limit);
+    List<Map<String, Object>> list();
 }

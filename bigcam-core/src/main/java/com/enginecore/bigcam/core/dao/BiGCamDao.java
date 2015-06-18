@@ -13,15 +13,17 @@ import java.util.List;
 public interface BiGCamDao {
     void save(BiGVideo biGVideo);
 
-    List<BiGVideo> list(@Param("keyword") String keyword, @Param("videoStatus") String videoStatus, @Param("channel") Integer channel, @Param("start") Integer start, @Param("limit") Integer limit);
+    List<BiGVideo> list(@Param("keyword") String keyword, @Param("videoStatus") String videoStatus, @Param("channel") Integer channel);
 
-    List<BiGVideo> liked(@Param("userId") Integer userId, @Param("start") Integer start, @Param("limit") Integer limit);
+    List<BiGVideo> liked(@Param("userId") Integer userId);
 
     void addPlayTimes(Integer videoId);
 
     void like(Integer videoId);
 
     void unLike(Integer videoId);
+
+    void delete(Integer videoId);
 
     void comment(Integer videoId);
 

@@ -45,10 +45,9 @@
     </resultMap>
 
     <select id="list" resultMap="biGVideo">
-        SELECT user_id, uuid, video_cover, video_desc, c.channel_text as channel_text, video_title, video_duration,
+        SELECT user_id, uuid, video_cover, video_desc, video_title, c.channel_text as channel_text, video_duration,
         video_content, like_times, play_times, comment_times, share_times, store_times, upload_time, video_id, bit_rate, video_status
-        FROM qh_video v JOIN qh_channel c
-        ON v.channel_id=c.channel_id
+        FROM qh_video v JOIN qh_channel c ON v.channel_id=c.channel_id
         <where>
             <if test="channel != null">
                 v.channel_id=#{channel}
@@ -60,8 +59,7 @@
                 and v.video_status=#{videoStatus}
             </if>
         </where>
-        ORDER BY upload_time
-        <if test="start != null">limit #{start}, #{limit}</if>
+        ORDER BY upload_time desc
     </select>
 
     <select id="liked" resultMap="biGVideo">
@@ -70,8 +68,7 @@
         FROM qh_video v JOIN qh_user_like_video qulv
         ON v.video_id=qulv.video_id
         AND qulv.user_id=#{userId}
-        ORDER BY qulv.like_time
-        <if test="start != null">limit #{start}, #{limit}</if>
+        ORDER BY qulv.like_time desc
     </select>
 
     <update id="addPlayTimes">
@@ -89,4 +86,8 @@
     <update id="comment">
         UPDATE qh_video SET comment_times = comment_times + 1 WHERE video_id=#{videoId}
     </update>
+
+    <delete id="delete">
+        delete from qh_video where video_id=#{videoId}
+    </delete>
 </mapper>

@@ -3,6 +3,8 @@ package com.enginecore.bigcam.mng.service.impl;
 import com.enginecore.bigcam.core.dao.UserSuggestionDao;
 import com.enginecore.bigcam.dto.beans.UserSuggestion;
 import com.enginecore.bigcam.mng.service.SuggestionService;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +32,9 @@ public class SuggestionServiceImpl implements SuggestionService {
     }
 
     @Override
-    public List<Map<String, Object>> list(Integer start, Integer limit) {
-        return userSuggestionDao.list(start, limit);
+    public List<Map<String, Object>> list(Integer pageNum, Integer pageSize) {
+        Page<Map<String, Object>> page = PageHelper.startPage(pageNum, pageSize);
+        userSuggestionDao.list();
+        return page.getResult();
     }
 }

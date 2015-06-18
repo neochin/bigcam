@@ -21,8 +21,5 @@
         ON qulv.user_id=qu.user_id
         WHERE qulv.video_id=#{videoId}
         ORDER BY like_time DESC
-        <if test="start != null">
-            limit #{start},#{limit}
-        </if>
     </select>
 </mapper>
