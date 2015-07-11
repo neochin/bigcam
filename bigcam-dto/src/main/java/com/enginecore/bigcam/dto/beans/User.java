@@ -32,7 +32,9 @@ public class User implements Serializable {
 
     private Integer countryId;
     private Integer provinceId;
+    private String province;
     private Integer cityId;
+    private String city;
 
     private boolean certificated;//true 表示为认证用户
 
@@ -44,6 +46,22 @@ public class User implements Serializable {
      * 认证类型
      */
     private String authType;//QQ,WeChat,Weibo
+
+    public String getProvince() {
+        return province;
+    }
+
+    public void setProvince(String province) {
+        this.province = province;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
 
     public String getAccessToken() {
         return accessToken;

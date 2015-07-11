@@ -11,9 +11,14 @@
         <result column="access_token" property="accessToken"/>
         <result column="open_id" property="openId"/>
         <result column="auth_type" property="authType"/>
+        <result column="province_name" property="province"/>
+        <result column="province_id" property="provinceId"/>
+        <result column="city_name" property="city"/>
+        <result column="city_id" property="cityId"/>
     </resultMap>
     <select id="findByUsername" resultMap="user">
-        select username,user_id,nickname,register_date,email,password, access_token, open_id, auth_type from qh_user where username=#{username}
+        select username,user_id,nickname,register_date,email,password, access_token, open_id, auth_type
+        from qh_user where username=#{username}
     </select>
     <select id="findByNickname" resultMap="user">
         select username,user_id,nickname,register_date,email,password, access_token, open_id, auth_type from qh_user where nickname=#{nickname}
@@ -24,12 +29,24 @@
     </insert>
 
     <select id="userProfile" resultType="java.util.Map">
-        select u.nickname, u.gender, p.text_cn as province, c.text_cn as city, u.signature_text as signatureText,
-        u.journey, u.pace_num as paceNum, u.certificated as certificated, u.username, u.profile_photo as profilePhoto
+        select u.nickname, u.gender, p.province_name, c.city_name,  p.province_id, c.city_id,
+        u.signature_text as signatureText, u.journey, u.pace_num as paceNum,
+        u.certificated as certificated, u.username, u.profile_photo as profilePhoto
         from qh_user u left join qh_province p
         on u.province_id=p.province_id
         left join qh_city c on c.city_id=u.city_id
         where u.user_id=#{userId}
+    </select>
+
+    <select id="province" resultType="java.util.Map">
+        select province_id as value, province_name as text
+        from qh_province
+    </select>
+
+    <select id="city" resultType="java.util.Map">
+        select city_id as value, city_name as text
+        from qh_city
+        where province_id=#{provinceId}
     </select>
 
     <sql id="defaultLimit">

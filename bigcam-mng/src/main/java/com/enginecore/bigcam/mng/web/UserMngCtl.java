@@ -205,6 +205,30 @@ public class UserMngCtl {
         return mv;
     }
 
+    @RequestMapping("/location/province")
+    public ModelAndView province() {
+        ModelAndView mv = new ModelAndView();
+        try {
+            mv.addObject("data", userService.province());
+        } catch (Exception e) {
+            mv.addObject("success", Boolean.FALSE);
+            logger.warn("获取省份列表异常", e);
+        }
+        return mv;
+    }
+
+    @RequestMapping("/location/city")
+    public ModelAndView city(@RequestParam Integer provinceId) {
+        ModelAndView mv = new ModelAndView();
+        try {
+            mv.addObject("data", userService.city(provinceId));
+        } catch (Exception e) {
+            mv.addObject("success", Boolean.FALSE);
+            logger.warn("获取市区列表异常", e);
+        }
+        return mv;
+    }
+
     @RequestMapping("/signature")
     public ModelAndView updateSignature(@RequestParam String signatureText) {
         ModelAndView mv = new ModelAndView();

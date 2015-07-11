@@ -105,3 +105,14 @@ create table IF NOT EXISTS qh_user_praise_comment(
  comment_id int(10),
  praise_time datetime
 )DEFAULT CHARACTER SET = utf8;
+
+create table IF NOT EXISTS qh_province(
+ province_id int(10),
+ province_name varchar(128)
+)DEFAULT CHARACTER SET = utf8;
+
+create table IF NOT EXISTS qh_city(
+ city_id int(10),
+ province_id int(10),
+ city_name varchar(128)
+)DEFAULT CHARACTER SET = utf8;

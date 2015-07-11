@@ -90,12 +90,13 @@
                     <value>/video/list</value>
                     <value>/video/persistNotify</value>
                     <value>/video/{videoId}/play</value>
-                    <value>/video/{videoId}/like</value>
                     <value>/video/{videoId}/likedUsers</value>
                     <value>/checkUpdate</value>
                     <value>/comment/load/{videoId}</value>
                     <value>/channel/list</value>
                     <value>/suggestion/suggest</value>
+                    <value>/user/location/province</value>
+                    <value>/user/location/city</value>
                 </set>
             </property>
         </bean>

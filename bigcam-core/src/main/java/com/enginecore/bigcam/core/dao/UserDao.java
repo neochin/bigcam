@@ -79,6 +79,9 @@ public interface UserDao {
 
     void updateLocation(@Param("provinceId") Integer provinceId, @Param("cityId") Integer cityId, @Param("userId") Integer userId);
 
+    List<Map<String, String>> province();
+    List<Map<String, String>> city(@Param("provinceId") Integer provinceId);
+
     void setProfilePhoto(@Param("profilePhoto") String profilePhoto, @Param("userId") Integer userId);
 
     void setSignature(@Param("signatureText") String signatureText, @Param("userId") Integer userId);

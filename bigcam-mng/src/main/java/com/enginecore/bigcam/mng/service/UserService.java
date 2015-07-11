@@ -4,6 +4,7 @@ import com.enginecore.bigcam.dto.beans.User;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -40,6 +41,10 @@ public interface UserService {
     void updateGender(String gender, Integer userId);
 
     void updateLocation(Integer provinceId, Integer cityId, Integer userId);
+
+    List<Map<String, String>> province();
+
+    List<Map<String, String>> city(Integer provinceId);
 
     void updateSignature(String signature, Integer userId);
 

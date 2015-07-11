@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -144,6 +145,16 @@ public class UserServiceImpl implements UserService {
     @Override
     public void updateLocation(Integer provinceId, Integer cityId, Integer userId) {
         userDao.updateLocation(provinceId, cityId, userId);
+    }
+
+    @Override
+    public List<Map<String, String>> province() {
+        return userDao.province();
+    }
+
+    @Override
+    public List<Map<String, String>> city(Integer provinceId) {
+        return userDao.city(provinceId);
     }
 
     @Override
