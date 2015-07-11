@@ -50,6 +50,7 @@ public class CommentCtl {
     public ModelAndView praise(@PathVariable Integer commentId) {
         ModelAndView modelAndView = new ModelAndView();
         Integer userId = SessionManager.getCurrentUserIdIgnoreLogin();
+        logger.info("赞评论.当前用户:" + userId);
         try {
             commentService.praise(userId, commentId);
             modelAndView.addObject("success", Boolean.TRUE);

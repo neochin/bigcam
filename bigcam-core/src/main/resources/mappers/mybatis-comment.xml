@@ -17,14 +17,23 @@
         <result column="repliedProfilePhoto" property="repliedProfilePhoto"/>
         <result column="praiseTimes" property="praiseTimes"/>
         <result column="commentTime" property="commentTime"/>
+        <result column="praised" property="praised"/>
     </resultMap>
 
     <sql id="commentMap">
-        SELECT qc.comment_id as commentId, u.user_id as userId, u.nickname as nickname,reply.user_id as repliedUserId, reply.nickname as repliedNickname,
-        qc.comment_text as commentText, u.profile_photo as profilePhoto, reply.profile_photo as repliedProfilePhoto, qc.praise_times as praiseTimes, qc.comment_time as commentTime
+        SELECT qc.comment_id as commentId, u.user_id as userId, u.nickname as nickname,
+        reply.user_id as repliedUserId, reply.nickname as repliedNickname,
+        qc.comment_text as commentText, u.profile_photo as profilePhoto,
+        reply.profile_photo as repliedProfilePhoto, temp.praise_times > 0 as praised,
+        qc.praise_times as praiseTimes, qc.comment_time as commentTime
         FROM qh_comment qc
         left join qh_user u ON qc.user_id=u.user_id
         left join qh_user reply on qc.replied_user_id=reply.user_id
+        left join (
+        select count(*) as praise_times, user_id, comment_id
+        from qh_user_praise_comment
+        group by user_id,comment_id
+        ) temp on temp.user_id=qc.user_id and temp.comment_id=qc.comment_id
     </sql>
 
     <select id="refresh" resultMap="commentBean">

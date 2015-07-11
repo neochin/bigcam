@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+	Created on : 2014年9月13日, 下午13:10
+	Author     : yameng.yang
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+	<!--<bean id="gtPush" class="com.gexin.rp.sdk.http.GtPush">-->
+		<!--<constructor-arg index="1"><null/></constructor-arg>-->
+		<!--<constructor-arg value="${bigcam.getui.appKey}"/>-->
+		<!--<constructor-arg value="${bigcam.getui.masterSecret}"/>-->
+	<!--</bean>-->
+	<!--<bean id="gtPusher" class="com.gexin.rp.sdk.http.IGtPush" init-method="connect">-->
+		<!--<constructor-arg value="${bigcam.getui.appKey}"/>-->
+		<!--<constructor-arg value="${bigcam.getui.masterSecret}"/>-->
+	<!--</bean>-->
+</beans>

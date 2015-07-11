@@ -93,10 +93,7 @@
                     <value>/video/{videoId}/like</value>
                     <value>/video/{videoId}/likedUsers</value>
                     <value>/checkUpdate</value>
-                    <value>/comment/{videoId}</value>
                     <value>/comment/load/{videoId}</value>
-                    <value>/comment/{commentId}/praise</value>
-                    <value>/comment/{commentId}/unPraise</value>
                     <value>/channel/list</value>
                     <value>/suggestion/suggest</value>
                 </set>

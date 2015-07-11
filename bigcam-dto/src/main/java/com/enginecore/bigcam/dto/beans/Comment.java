@@ -17,8 +17,8 @@ public class Comment {
     @JSONField(format = "yyyy-MM-dd HH:mm:ss")
     private Date commentTime;
 
-    private Integer praiseTimes;//评论被赞的次数
-    private Boolean praised;//是否评论过
+    private int praiseTimes;//评论被赞的次数
+    private boolean praised;//是否赞过
 
     private String nickname;//评论者的昵称
     private String profilePhoto;
@@ -93,12 +93,8 @@ public class Comment {
         return praised;
     }
 
-    public void setPraised(Integer praised) {
-        if (null == praised) {
-            this.praised = false;
-            return;
-        }
-        this.praised = praised > 0;
+    public void setPraised(Boolean praised) {
+        this.praised = praised;
     }
 
     public String getNickname() {

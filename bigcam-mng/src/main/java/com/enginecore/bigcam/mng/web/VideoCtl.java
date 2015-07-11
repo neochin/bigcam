@@ -1,6 +1,7 @@
 package com.enginecore.bigcam.mng.web;
 
 import com.enginecore.bigcam.core.SessionManager;
+import com.enginecore.bigcam.core.util.IGtPushUtil;
 import com.enginecore.bigcam.dto.beans.BiGVideo;
 import com.enginecore.bigcam.mng.service.VideoService;
 import org.apache.commons.logging.Log;

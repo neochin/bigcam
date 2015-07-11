@@ -21,23 +21,12 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public List<Comment> refresh(Integer userId, Integer videoId, Integer limit) {
         List<Comment> list = commentDao.refresh(videoId, limit);
-        praised(list, userId);
         return list;
     }
     @Override
     public List<Comment> load(Integer userId, Integer videoId, Integer commentId, Integer limit) {
         List<Comment> list = commentDao.load(videoId, commentId, limit);
-        praised(list, userId);
         return list;
-    }
-
-    private void praised(List<Comment> comments, Integer userId) {
-        if (userId == null) {
-            return;
-        }
-        for (Comment comment : comments) {
-            comment.setPraised(userPraiseCommentDao.praised(userId, comment.getCommentId()));
-        }
     }
 
     @Override
