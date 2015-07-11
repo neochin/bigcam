@@ -182,7 +182,7 @@ public class VideoCtl {
     }
 
     @RequestMapping("likedVideos")
-    public ModelAndView likedVideos(@RequestParam(defaultValue = "0") Integer pageNum, @RequestParam(defaultValue = "30") Integer pageSize) {
+    public ModelAndView likedVideos(@RequestParam(defaultValue = "1") Integer pageNum, @RequestParam(defaultValue = "30") Integer pageSize) {
         ModelAndView modelAndView = new ModelAndView();
         Integer userId = SessionManager.getCurrentUserId();
         try {

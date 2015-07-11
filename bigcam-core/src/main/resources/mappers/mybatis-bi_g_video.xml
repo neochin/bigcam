@@ -63,7 +63,7 @@
     </select>
 
     <select id="liked" resultMap="biGVideo">
-        SELECT user_id, uuid, video_cover, video_desc, video_title, video_duration,
+        SELECT v.user_id, uuid, video_cover, video_desc, video_title, video_duration,
         video_content, like_times, play_times, comment_times, share_times, store_times, upload_time, bit_rate, video_status
         FROM qh_video v JOIN qh_user_like_video qulv
         ON v.video_id=qulv.video_id
