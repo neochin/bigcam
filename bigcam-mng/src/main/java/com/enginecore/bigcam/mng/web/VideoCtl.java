@@ -169,7 +169,7 @@ public class VideoCtl {
     }
 
     @RequestMapping("{videoId}/likedUsers")
-    public ModelAndView likedUsers(@PathVariable Integer videoId, @RequestParam(defaultValue = "0") Integer pageNum, @RequestParam(defaultValue = "10") Integer pageSize) {
+    public ModelAndView likedUsers(@PathVariable Integer videoId, @RequestParam(defaultValue = "1") Integer pageNum, @RequestParam(defaultValue = "10") Integer pageSize) {
         ModelAndView modelAndView = new ModelAndView();
         try {
             List<Map<String, Object>> likedUsers = videoService.likedUsers(videoId, pageNum, pageSize);

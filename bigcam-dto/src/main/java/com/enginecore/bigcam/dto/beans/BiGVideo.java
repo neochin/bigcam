@@ -68,7 +68,7 @@ public class BiGVideo {
         if (count < 1) {
             this.liked = false;
         }
-        if (count == 1) {
+        if (count >= 1) {
             this.liked = true;
         }
     }

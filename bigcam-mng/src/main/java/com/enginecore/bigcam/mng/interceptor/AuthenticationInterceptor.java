@@ -8,6 +8,7 @@ import org.springframework.web.util.UriTemplate;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.IOException;
 import java.util.Set;
 
 /**
@@ -31,24 +32,32 @@ public class AuthenticationInterceptor extends HandlerInterceptorAdapter {
         this.skipTokenURI = skipTokenURI;
     }
 
-    @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        String requestURI = request.getRequestURI();
+    private boolean needLogin(HttpServletResponse response, String requestURI) throws IOException {
         if (loginURI.equals(requestURI) || registerURI.equals(requestURI)) {
             return true;
         }
         if (skip(requestURI)) {
             return true;
         }
+        response.setStatus(403);
+        response.setContentType("text/json;charset=UTF-8");
+        response.getWriter().write("{\"success\":false, \"msg\":\"need login\"}");
+        return false;
+    }
+
+    @Override
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        String requestURI = request.getRequestURI();
         HttpSession currSession = request.getSession();
-        Object currUser = currSession.getAttribute(SessionManager.CURRENT_USER_KEY);
-        if (currUser == null) {
-            response.setStatus(403);
-            response.setContentType("text/json;charset=UTF-8");
-            response.getWriter().write("{\"success\":false, \"msg\":\"need login\"}");
-            return false;
+        if (currSession == null) {
+            return needLogin(response, requestURI);
+        } else {
+            Object currUser = currSession.getAttribute(SessionManager.CURRENT_USER_KEY);
+            SessionManager.setCurrentSession(request.getSession());
+            if (currUser == null) {
+                return needLogin(response, requestURI);
+            }
         }
-        SessionManager.setCurrentSession(request.getSession());
         return super.preHandle(request, response, handler);
     }
 
